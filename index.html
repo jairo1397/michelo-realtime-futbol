@@ -63,104 +63,17 @@
             z-index: 20;
         }
 
-        /* Contenedor de las capas de transición */
-        .transition-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 25; /* Por encima del gol */
-            overflow: hidden; 
-            pointer-events: none;
-        }
-
-        /* Base para las formas circulares */
-        .wipe-element {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            width: 0;
-            height: 0;
-        }
-
-        /* CELESTE */
-        .celeste-solid { background-color: #00BFFF; }
-        .celeste-hole { background-color: transparent; box-shadow: 0 0 0 300vmax #00BFFF; opacity: 0; }
-
-        /* AZUL */
-        .azul-solid { background-color: #0000CD; }
-        .azul-hole { background-color: transparent; box-shadow: 0 0 0 300vmax #0000CD; opacity: 0; }
-
         /* Clases activas cuando hay gol (Se asignan desde Javascript) */
         .is-goal .gol-overlay { animation: showGoal 7s linear forwards; animation-delay: var(--delay, 0ms); }
-        .is-goal .celeste-solid { animation: solidCeleste 7s ease-in-out forwards; animation-delay: var(--delay, 0ms); }
-        .is-goal .celeste-hole { animation: holeCeleste 7s ease-in-out forwards; animation-delay: var(--delay, 0ms); }
-        .is-goal .azul-solid { animation: solidAzul 7s ease-in-out forwards; animation-delay: var(--delay, 0ms); }
-        .is-goal .azul-hole { animation: holeAzul 7s ease-in-out forwards; animation-delay: var(--delay, 0ms); }
 
-        /* Keyframes del gol */
-        /* Keyframes del gol */
+        /* Keyframes del fade del video de gol */
         @keyframes showGoal {
             0% { opacity: 0; }
             43.28% { opacity: 0; } /* 3.03s (3030 / 7000) */
             50.00% { opacity: 1; } /* Termina el fade in suave */
-            88.14% { opacity: 1; } /* 6.17s (6170 / 7000) Empieza la transición */
-            92.14% { opacity: 0; } /* Se desvanece mientras la transición azul lo cubre */
+            88.14% { opacity: 1; } /* 6.17s (6170 / 7000) */
+            92.14% { opacity: 0; } /* Se desvanece */
             100% { opacity: 0; }
-        }
-
-        /* KEYFRAMES CELESTE */
-        @keyframes solidCeleste {
-            0%, 88.13% { width: 0; height: 0; opacity: 1; } /* Inicia en 6.17s */
-            90.71%, 94.27% { width: 300vmax; height: 300vmax; opacity: 1; }
-            94.28%, 100% { width: 300vmax; height: 300vmax; opacity: 0; }
-        }
-        @keyframes holeCeleste {
-            0%, 94.27% { width: 0; height: 0; opacity: 0; }
-            94.28% { width: 0; height: 0; opacity: 1; }
-            98.57%, 100% { width: 300vmax; height: 300vmax; opacity: 1; }
-        }
-
-        /* KEYFRAMES AZUL */
-        @keyframes solidAzul {
-            0%, 89.56% { width: 0; height: 0; opacity: 1; }
-            92.14% { width: 300vmax; height: 300vmax; opacity: 1; }
-            92.15%, 100% { width: 300vmax; height: 300vmax; opacity: 0; }
-        }
-        @keyframes holeAzul {
-            0%, 92.14% { width: 0; height: 0; opacity: 0; }
-            92.15% { width: 0; height: 0; opacity: 1; } 
-            96.42%, 100% { width: 300vmax; height: 300vmax; opacity: 1; } 
-        }
-
-        /* ANIMACIONES PARA OTROS EQUIPOS (Sin video, solo círculos) */
-        .is-goal-other .celeste-solid { animation: otherSolidCeleste 2s ease-in-out forwards; animation-delay: calc(3030ms + var(--delay, 0ms)); }
-        .is-goal-other .celeste-hole { animation: otherHoleCeleste 2s ease-in-out forwards; animation-delay: calc(3030ms + var(--delay, 0ms)); }
-        .is-goal-other .azul-solid { animation: otherSolidAzul 2s ease-in-out forwards; animation-delay: calc(3030ms + var(--delay, 0ms)); }
-        .is-goal-other .azul-hole { animation: otherHoleAzul 2s ease-in-out forwards; animation-delay: calc(3030ms + var(--delay, 0ms)); }
-
-        @keyframes otherSolidCeleste {
-            0%, 10% { width: 0; height: 0; opacity: 1; }
-            40%, 60% { width: 300vmax; height: 300vmax; opacity: 1; }
-            60.01%, 100% { width: 300vmax; height: 300vmax; opacity: 0; }
-        }
-        @keyframes otherHoleCeleste {
-            0%, 60% { width: 0; height: 0; opacity: 0; }
-            60.01% { width: 0; height: 0; opacity: 1; }
-            90%, 100% { width: 300vmax; height: 300vmax; opacity: 1; }
-        }
-        @keyframes otherSolidAzul {
-            0%, 20% { width: 0; height: 0; opacity: 1; }
-            50% { width: 300vmax; height: 300vmax; opacity: 1; }
-            50.01%, 100% { width: 300vmax; height: 300vmax; opacity: 0; }
-        }
-        @keyframes otherHoleAzul {
-            0%, 50% { width: 0; height: 0; opacity: 0; }
-            50.01% { width: 0; height: 0; opacity: 1; } 
-            80%, 100% { width: 300vmax; height: 300vmax; opacity: 1; } 
         }
         
         /* Texto de prueba (Opcional) */
@@ -283,13 +196,6 @@
             <source src="./assets/plantilla_mundial_gol.mp4" type="video/mp4">
         </video>
 
-        <!-- Capas de transición circulares (Abre el hueco desde el centro) -->
-        <div class="transition-container">
-            <div class="wipe-element celeste-solid"></div>
-            <div class="wipe-element celeste-hole"></div>
-            <div class="wipe-element azul-solid"></div>
-            <div class="wipe-element azul-hole"></div>
-        </div>
 
         <!-- Marcador superpuesto -->
         <div class="scoreboard" id="scoreboard" style="display: none;">
@@ -442,7 +348,6 @@
 
         const resetAnimations = () => {
             container.classList.remove('is-goal');
-            container.classList.remove('is-goal-other');
             golVideo.pause();
             golVideo.currentTime = 0;
         };
@@ -470,25 +375,6 @@
             if (codigo_iso && codigo_iso.trim()) return codigo_iso.trim().toUpperCase();
             return name ? name.substring(0, 3).toUpperCase() : "";
         };
-
-        // Función para verificar si el gol es de Ecuador
-        function checkEcuadorGoal(nuevoHome, currentHomeScore, nuevoAway, currentAwayScore, partido) {
-            let isEcuador = false;
-            const checkTeam = (team) => {
-                if (!team) return false;
-                if (team.codigo_iso && team.codigo_iso.toUpperCase() === 'ECU') return true;
-                if (team.nombre && team.nombre.toUpperCase().includes('ECUADOR')) return true;
-                return false;
-            };
-
-            if (nuevoHome > currentHomeScore && checkTeam(partido.local)) {
-                isEcuador = true;
-            }
-            if (nuevoAway > currentAwayScore && checkTeam(partido.visitante)) {
-                isEcuador = true;
-            }
-            return isEcuador;
-        }
 
         // Función inicial para cargar datos del partido
         async function fetchInitialFixtureData(fixtureId) {
@@ -560,8 +446,7 @@
                     // Si detectamos un gol mientras estábamos apagados, calculamos el tiempo y lanzamos
                     if (isHiddenGoal) {
                         const elapsed = Date.now() - pageLoadTime;
-                        const isEcuador = checkEcuadorGoal(nuevoHome, savedHome, nuevoAway, savedAway, partido);
-                        triggerGoalAnimation(nuevoHome, nuevoAway, elapsed, isEcuador);
+                        triggerGoalAnimation(nuevoHome, nuevoAway, elapsed);
                     }
                     
                     // Iniciar el chequeo de goles
@@ -609,8 +494,8 @@
         }
 
         // Función para activar visualmente el gol sincronizado
-        function triggerGoalAnimation(newHomeScore, newAwayScore, timeElapsed = 0, isEcuadorGoal = true) {
-            console.log(`¡GOL DETECTADO! Sincronizando animación con retraso de ${timeElapsed}ms... (Ecuador: ${isEcuadorGoal})`);
+        function triggerGoalAnimation(newHomeScore, newAwayScore, timeElapsed = 0) {
+            console.log(`¡GOL DETECTADO! Sincronizando animación con retraso de ${timeElapsed}ms...`);
             
             // Actualizar variables de estado internas
             currentHomeScore = newHomeScore;
@@ -619,27 +504,15 @@
             // Adelantar toda la animación CSS usando un delay negativo igual al tiempo transcurrido
             container.style.setProperty('--delay', `-${timeElapsed}ms`);
 
-            if (isEcuadorGoal) {
-                // Reproducir toda la animación CSS y video agregando la clase 'is-goal' al contenedor
-                container.classList.add('is-goal');
+            // Reproducir toda la animación CSS y video agregando la clase 'is-goal' al contenedor
+            container.classList.add('is-goal');
 
-                // Actualizar el DOM exactamente a los 3500ms del tiempo global del anuncio
-                const domUpdateWait = Math.max(0, 3500 - timeElapsed);
-                setTimeout(() => {
-                    document.getElementById('home-score').innerText = newHomeScore;
-                    document.getElementById('away-score').innerText = newAwayScore;
-                }, domUpdateWait);
-            } else {
-                // Animación rápida solo de círculos para otros equipos (Inicia a los 3.03s)
-                container.classList.add('is-goal-other');
-
-                // La animación other inicia a los 3030ms y dura 2s. En el 50% de la animación (4030ms) cubre toda la pantalla.
-                const domUpdateWait = Math.max(0, 4030 - timeElapsed);
-                setTimeout(() => {
-                    document.getElementById('home-score').innerText = newHomeScore;
-                    document.getElementById('away-score').innerText = newAwayScore;
-                }, domUpdateWait);
-            }
+            // Actualizar el DOM exactamente a los 3500ms del tiempo global del anuncio
+            const domUpdateWait = Math.max(0, 3500 - timeElapsed);
+            setTimeout(() => {
+                document.getElementById('home-score').innerText = newHomeScore;
+                document.getElementById('away-score').innerText = newAwayScore;
+            }, domUpdateWait);
         }
 
         // --- POLLING (Consulta periódica para detectar goles) ---
@@ -663,14 +536,13 @@
                         // Si alguno de los puntajes es mayor al que teníamos guardado, ¡hubo un gol en vivo!
                         if (nuevoHome > currentHomeScore || nuevoAway > currentAwayScore) {
                             const timeElapsed = Date.now() - pageLoadTime;
-                            const isEcuador = checkEcuadorGoal(nuevoHome, currentHomeScore, nuevoAway, currentAwayScore, partido);
                             
                             // Límite de tiempo para sincronizar: 3030ms para ambos, ya que la animación de círculos también inicia en el segundo 3.03.
                             const maxSyncTime = 3030;
 
                             // Si estamos dentro del límite de tiempo, lanzamos la animación
                             if (timeElapsed <= maxSyncTime) {
-                                triggerGoalAnimation(nuevoHome, nuevoAway, timeElapsed, isEcuador);
+                                triggerGoalAnimation(nuevoHome, nuevoAway, timeElapsed);
                                 // Actualizar la memoria permanente
                                 localStorage.setItem(`alac_home_${fixtureId}`, nuevoHome);
                                 localStorage.setItem(`alac_away_${fixtureId}`, nuevoAway);
