@@ -4,14 +4,21 @@ Este documento detalla el funcionamiento interno de la pantalla de marcador en t
 
 ## Arquitectura de la Animación
 
-La animación de gol está construida enteramente mediante CSS y Javascript, apoyada en recursos de video. La línea de tiempo completa dura exactamente **7 segundos**, estructurada de la siguiente manera:
-- **00:00 - 03:03s**: Tiempo de espera oculto (Fade in progresivo).
-- **03:03s**: Aparición principal del "Video Gol".
-- **03:11s**: Inicio del desvanecimiento del video.
+La visualización está construida con HTML, CSS y Javascript, utilizando dos plantillas de video principales:
+1. **Video Base (Marcador):** `assets/plantilla_mundial_score.mp4` que se reproduce en bucle continuo de fondo.
+2. **Video de Gol (Capa Superpuesta):** `assets/plantilla_mundial_gol.mp4` que aparece únicamente cuando se detecta una anotación.
+
+Ya no existen animaciones complejas de círculos en CSS; todo el peso visual recae en las dos plantillas de video de alta calidad. 
+
+La animación de gol dura aproximadamente **7 segundos**, y está estructurada de la siguiente manera:
+- **00:00 - 03:03s**: Tiempo de espera oculto (Fade in progresivo de la capa superpuesta).
+- **03:03s**: Aparición principal de la plantilla del "Video Gol".
 - **03:50s**: Actualización del texto del marcador en el DOM.
-- **06:17s**: Transición de círculos finales para revelar el marcador actualizado.
-- **07:00s**: Fin de la animación.
+- **06:17s**: Inicio del desvanecimiento del video de gol para volver a mostrar el marcador estático.
 - **07:00s - 10:00s**: El marcador permanece estático mostrando el resultado actualizado hasta que termine el anuncio.
+
+## Tipografías y Diseño
+El nuevo diseño implementa las fuentes `ULTRASans-Bold` y `ULTRASans-Regular` para los equipos, marcadores y tiempo. Además, los nombres de los equipos cuentan con un efecto de sombra (eco visual) generado con CSS para darles mayor profundidad, mientras que los elementos están organizados en una sola fila horizontal centrada en la parte inferior.
 
 ## Lógica de Detección de Goles
 
@@ -36,4 +43,4 @@ El mayor reto es que el reproductor outdoor cortará la pantalla abruptamente a 
 - **Gol detectado después de los 3.03s:**
   Si el gol se detecta muy tarde (ej. a los 5 segundos), iniciar la animación haría que se pierda la parte inicial del video o que no coincida con el diseño planeado.
   **Solución (Postergación Estratégica):** El sistema bloquea la animación y simplemente actualiza las variables en memoria para no seguir consultando, **PERO intencionalmente no actualiza el `localStorage`**. De esta forma, el anuncio terminará tranquilamente mostrando el resultado viejo.
-  Cuando el anuncio vuelva a rotar en la pantalla (quizás 3 minutos después), cargará el caché desactualizado, el sistema aplicará la regla del **"Gol Oculto"** y festejará el gol a toda pantalla desde el segundo cero.
+  Cuando el anuncio vuelva a rotar en la pantalla, cargará el caché desactualizado, el sistema aplicará la regla del **"Gol Oculto"** y festejará el gol a toda pantalla desde el segundo cero.

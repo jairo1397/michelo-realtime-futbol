@@ -184,7 +184,22 @@
             color: #ffffff;
             font-family: 'ULTRASans', 'Impact', sans-serif;
             z-index: 10;
+            width: 100%;
+        }
+
+        .team-group {
+            display: flex;
+            align-items: center;
+            flex: 1; /* Ocupa mitad y mitad para forzar el centro perfecto */
             gap: 22px;
+        }
+
+        .home-group {
+            justify-content: flex-end;
+        }
+
+        .away-group {
+            justify-content: flex-start;
         }
 
         .team-score {
@@ -235,7 +250,10 @@
             font-weight: normal;
             transform: scaleY(0.9);
             letter-spacing: 2px;
-            margin: 0 10px;
+            margin: 0 22px;
+            width: 107px;
+            text-align: center;
+            flex-shrink: 0;
         }
 
         #loading-overlay {
@@ -274,15 +292,19 @@
 
         <!-- Marcador superpuesto -->
         <div class="scoreboard" id="scoreboard" style="display: none;">
-            <span class="team-name" id="home-name" data-text="LOCAL">LOCAL</span>
-            <img class="team-logo" id="home-logo" src="" alt="Home">
-            <span class="team-score" id="home-score">0</span>
+            <div class="team-group home-group">
+                <span class="team-name" id="home-name" data-text="LOCAL">LOCAL</span>
+                <img class="team-logo" id="home-logo" src="" alt="Home">
+                <span class="team-score" id="home-score">0</span>
+            </div>
             
             <span class="match-time" id="match-time">45:00</span>
             
-            <span class="team-score" id="away-score">0</span>
-            <img class="team-logo" id="away-logo" src="" alt="Away">
-            <span class="team-name" id="away-name" data-text="VISITA">VISITA</span>
+            <div class="team-group away-group">
+                <span class="team-score" id="away-score">0</span>
+                <img class="team-logo" id="away-logo" src="" alt="Away">
+                <span class="team-name" id="away-name" data-text="VISITA">VISITA</span>
+            </div>
         </div>
         
     </div>
@@ -300,6 +322,53 @@
 
         // Guardamos el momento exacto en el que el HTML se empezó a mostrar
         const pageLoadTime = Date.now();
+
+        let globalPartido = null;
+        let globalFixtureId = null;
+
+        const updateVisualTime = () => {
+            if (!globalPartido) return;
+            const p = globalPartido;
+            const timeEl = document.getElementById('match-time');
+            
+            if (p.estado === 'finalizado') {
+                timeEl.innerText = "FT";
+                return;
+            } else if (p.estado === 'no_iniciado') {
+                timeEl.innerText = "vs";
+                return;
+            } else if (p.estado === 'descanso' || (p.tiempo && (p.tiempo.codigo === 'MT' || p.tiempo.codigo === 'HT'))) {
+                timeEl.innerText = p.tiempo.texto || "Descanso";
+                return;
+            }
+
+            if (p.tiempo && p.tiempo.minuto !== null && p.estado === 'en_juego') {
+                const baseMin = parseInt(p.tiempo.minuto) || 0;
+                const extraMin = parseInt(p.tiempo.minuto_extra) || 0;
+                const apiMinute = baseMin + extraMin;
+
+                const savedMin = localStorage.getItem(`alac_min_${globalFixtureId}`);
+                const savedTime = localStorage.getItem(`alac_min_start_${globalFixtureId}`);
+                
+                let seconds = 0;
+                if (savedMin == apiMinute && savedTime) {
+                    seconds = Math.floor((Date.now() - parseInt(savedTime)) / 1000);
+                } else {
+                    localStorage.setItem(`alac_min_${globalFixtureId}`, apiMinute);
+                    localStorage.setItem(`alac_min_start_${globalFixtureId}`, Date.now());
+                }
+                
+                let displaySeconds = seconds > 59 ? 59 : seconds; // Limitar a 59s
+                const secStr = displaySeconds < 10 ? '0' + displaySeconds : displaySeconds;
+                timeEl.innerText = `${apiMinute}:${secStr}`;
+            } else if (p.tiempo && p.tiempo.texto) {
+                timeEl.innerText = p.tiempo.texto;
+            } else {
+                timeEl.innerText = "";
+            }
+        };
+
+        setInterval(updateVisualTime, 1000);
 
         const container = document.querySelector('.container');
         const videoFondo = document.querySelector('.video-fondo');
@@ -433,6 +502,7 @@
                 // Al buscar por filtro, esperamos un arreglo dentro de 'partidos'
                 if (data && data.partidos && data.partidos.length > 0) {
                     const partido = data.partidos[0];
+                    globalPartido = partido;
                     const local = partido.local;
                     const visitante = partido.visitante;
                     const marcador = partido.marcador;
@@ -479,6 +549,9 @@
                     document.getElementById('away-name').setAttribute('data-text', awayNameText);
                     document.getElementById('away-score').innerText = currentAwayScore;
 
+                    // Actualizar tiempo en el DOM
+                    updateVisualTime();
+
                     // Guardar el resultado real más reciente en la memoria para la próxima carga
                     localStorage.setItem(`alac_home_${fixtureId}`, nuevoHome);
                     localStorage.setItem(`alac_away_${fixtureId}`, nuevoAway);
@@ -524,13 +597,13 @@
                     finishDataLoad();
                 } else {
                     console.error("No se encontró el partido con fixture_id:", fixtureId);
-                    dataLoaded = true;
-                    checkAllLoaded();
+                    console.log("Reintentando obtener datos en 3 segundos...");
+                    setTimeout(() => fetchInitialFixtureData(fixtureId), 3000);
                 }
             } catch (error) {
                 console.error(`Error al consultar el partido inicial ${fixtureId}:`, error);
-                dataLoaded = true;
-                checkAllLoaded();
+                console.log("Reintentando obtener datos en 3 segundos...");
+                setTimeout(() => fetchInitialFixtureData(fixtureId), 3000);
             }
         }
 
@@ -580,6 +653,9 @@
                     
                     if (result && result.partidos && result.partidos.length > 0) {
                         const partido = result.partidos[0];
+                        globalPartido = partido;
+                        updateVisualTime();
+
                         const nuevoHome = parseInt(partido.marcador.local) || 0;
                         const nuevoAway = parseInt(partido.marcador.visitante) || 0;
 
@@ -624,6 +700,8 @@
             fixtureId = 9;
         }
         
+        globalFixtureId = fixtureId;
+
         fetchInitialFixtureData(fixtureId);
     </script>
 </body>
