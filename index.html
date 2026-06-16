@@ -238,14 +238,25 @@
             const p = globalPartido;
             const timeEl = document.getElementById('match-time');
             
+            const setTimeText = (text) => {
+                timeEl.innerText = text;
+                if (text.length > 5) {
+                    timeEl.style.fontSize = "17px";
+                    timeEl.style.letterSpacing = "1px";
+                } else {
+                    timeEl.style.fontSize = "26px";
+                    timeEl.style.letterSpacing = "2px";
+                }
+            };
+
             if (p.estado === 'finalizado') {
-                timeEl.innerText = "FT";
+                setTimeText("FT");
                 return;
             } else if (p.estado === 'no_iniciado') {
-                timeEl.innerText = "vs";
+                setTimeText("vs");
                 return;
             } else if (p.estado === 'descanso' || (p.tiempo && (p.tiempo.codigo === 'MT' || p.tiempo.codigo === 'HT'))) {
-                timeEl.innerText = p.tiempo.texto || "Descanso";
+                setTimeText(p.tiempo.texto || "MT");
                 return;
             }
 
@@ -267,11 +278,11 @@
                 
                 let displaySeconds = seconds > 59 ? 59 : seconds; // Limitar a 59s
                 const secStr = displaySeconds < 10 ? '0' + displaySeconds : displaySeconds;
-                timeEl.innerText = `${apiMinute}:${secStr}`;
+                setTimeText(`${apiMinute}:${secStr}`);
             } else if (p.tiempo && p.tiempo.texto) {
-                timeEl.innerText = p.tiempo.texto;
+                setTimeText(p.tiempo.texto);
             } else {
-                timeEl.innerText = "";
+                setTimeText("");
             }
         };
 
