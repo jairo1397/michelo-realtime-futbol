@@ -280,7 +280,6 @@
         const container = document.querySelector('.container');
         const videoFondo = document.querySelector('.video-fondo');
         const golVideo = document.querySelector('.gol-overlay');
-        const azulHole = document.querySelector('.azul-hole');
         const loadingOverlay = document.getElementById('loading-overlay');
 
         // --- LÓGICA DE CARGA (PANTALLA NEGRA) ---
@@ -354,14 +353,6 @@
 
         // Cuando termina la animación de gol, reseteamos las clases para que esté listo para el próximo
         golVideo.addEventListener('animationend', resetAnimations);
-        
-        // Para la animación de otros equipos, escuchamos el final de los círculos (por ejemplo el hole azul)
-        azulHole.addEventListener('animationend', (e) => {
-            // Solo si es la animación de otros equipos (otherHoleAzul)
-            if (e.animationName === 'otherHoleAzul') {
-                resetAnimations();
-            }
-        });
 
         // --- CONEXIÓN AL NUEVO API ---
         const API_URL = 'https://alacapipollamundialista.alacoohperu.pe/api/public';
